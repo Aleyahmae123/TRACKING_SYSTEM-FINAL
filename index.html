@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TRACKING SYSTEM</title>
+
+  <!-- simple styling file -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js CDN (for charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  
+  
+
+ <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-container">
+  <div class="login-box">
+    <div class="login-left">
+      <h2>WELCOME BACK!</h2>
+      <p>Enter your username and password to continue.</p>
+    </div>
+    <div class="login-right">
+      <h3>Login</h3>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p class="signup-text">Don't have an account? <a href="#">Sign up</a></p>
+      <div id="errorMsg" class="error"></div>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- MAIN APP (hidden until login) -->
+  <div id="appScreen" style="display:none">
+    <!-- your entire existing .app code goes here -->
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="logo">🔔</div>
+          <div class="brand-name">AURO</div>
+        </div>
+        <nav class="nav">
+  <button class="nav-item active" data-section="dashboard">
+    <span class="icon dashboard">📊</span> Dashboard
+  </button>
+  <button class="nav-item" data-section="calendar">
+    <span class="icon calendar">📅</span> Calendar
+  </button>
+  <button class="nav-item" data-section="workflow">
+    <span class="icon workflow">🔀</span> Workflow
+  </button>
+  <button class="nav-item" data-section="hashtags">
+    <span class="icon hashtags">#️</span> Hashtags
+  </button>
+  <button class="nav-item" data-section="ugc">
+    <span class="icon ugc">🔎</span> UGC Tracker
+  </button>
+  <button class="nav-item" data-section="settings">
+    <span class="icon settings">⛯</span> Settings
+  </button>
+</nav>
+      </aside>
+
+      <div class="main">
+        <header class="header">
+          <h1>AURO Academic Clubs — KPI Monitor</h1>
+          <div class="header-actions">
+            <label class="role-label">Role:
+              <select id="roleSelect">
+                <option>Admin</option>
+                <option>Contributor</option>
+                <option>Officer</option>
+              </select>
+            </label>
+            <button id="exportCsvBtn" class="btn small">Export CSV</button>
+            <button id="logoutBtn" class="btn small">Logout</button>
+          </div>
+        </header>
+
+        <div class="header-actions">
+  <label for="clubSelect">Filter:</label>
+  <select id="clubSelect" onchange="switchClub(this.value)">
+    <option value="vibes">AURO </option>
+    <option value="sites">Sites</option>
+    <option value="arts">Vibes </option>
+  </select>
+</div>
+
+        <main class="content-area">
+          <!-- your sections (dashboard, calendar, etc.) here -->
+
+        <!-- Dashboard section -->
+        <section id="dashboard" class="section active">
+          <div class="kpi-row">
+            <div class="kpi-card">
+           <div class="kpi-header"><i>👥</i> Followers</div>
+    <div id="followersVal" class="kpi-value">—</div>
+    <div class="kpi-sub">Target: <span id="followersTarget"></span></div>
+            </div>
+            <div class="kpi-card">
+             <div class="kpi-header"><i>❤️</i> Engagement</div>
+    <div id="engagementVal" class="kpi-value">—</div>
+    <div class="kpi-sub">Target: <span id="engagementTarget"></span>%</div>
+            </div>
+            <div class="kpi-card">
+            <div class="kpi-header"><i>🌍</i> Monthly Reach</div>
+    <div id="reachVal" class="kpi-value">—</div>
+    <div class="kpi-sub">Target: <span id="reachTarget"></span></div>
+            </div>
+            <div class="kpi-card">
+             <div class="kpi-header"><i>🏫</i> Campus Visits</div>
+    <div id="visitsVal" class="kpi-value">—</div>
+    <div class="kpi-sub">Target: <span id="visitsTarget"></span></div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">Reach & Engagement</div>
+              <canvas id="reachChart" height="160"></canvas>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Audience Mix</div>
+              <canvas id="audiencePie" height="160"></canvas>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">August — Content Calendar</div>
+              <div id="calendarGrid" class="calendar-grid"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">Templates & Branding Guide</div>
+              <div id="templatesArea">
+                <!-- template cards inserted here -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+     <!-- Calendar section (separate view) -->
+<section id="calendar" class="section">
+  <div class="card">
+    <div class="card-title">Content Calendar (August)</div>
+
+    <!-- Event creation (Admin only) -->
+    <div class="editable" style="margin-bottom:10px; display:flex; gap:8px; flex-wrap:wrap;">
+      <input id="eventTitle" placeholder="Event Title" />
+      <input id="eventDate" type="date" />
+      <select id="eventAudience">
+        <option>SHS Students</option>
+        <option>College Freshmen</option>
+        <option>Alumni</option>
+        <option>Parents</option>
+        <option>Faculty/Staff</option>
+      </select>
+      <button id="addEventBtn" class="btn small">Add Event</button>
+    </div>
+
+    <!-- Calendar grid -->
+    <div id="calendarGridLarge" class="calendar-grid"></div>
+  </div>
+</section>
+
+<!-- Event edit modal -->
+<div id="eventModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:white; padding:20px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,0.2); z-index:999;">
+  <h3>Edit Event</h3>
+  <input id="modalTitle" placeholder="Event title" />
+  <select id="modalAudience"></select>
+  <button id="saveEventBtn" class="btn small">Save</button>
+  <button id="deleteEventBtn" class="btn small" style="background:#f87171;color:white;">Delete</button>
+  <button onclick="closeModal()" class="btn small">Close</button>
+</div>
+        <!-- Workflow section -->
+        <section id="workflow" class="section">
+          <div class="card">
+            <div class="card-title">Workflow Kanban</div>
+            <div id="kanban" class="kanban-grid"></div>
+          </div>
+        </section>
+
+        <!-- Hashtag planner -->
+        <section id="hashtags" class="section">
+          <div class="card">
+            <div class="card-title">Hashtag Planner</div>
+            <div class="hashtag-controls">
+              <input id="tagInput" placeholder="#Vibes #Enrollment" />
+              <button id="addTagBtn" class="btn editable">Add</button>
+            </div>
+            <div id="tagsList" class="tags-list"></div>
+          </div>
+        </section>
+
+        <!-- UGC tracker -->
+        <section id="ugc" class="section">
+          <div class="card">
+            <div class="card-title">UGC Submissions</div>
+            <div class="ugc-form editable">
+              <input id="ugcName" placeholder="Student name" />
+              <select id="ugcClub"></select>
+              <input id="ugcLink" placeholder="Link to post" />
+              <input id="ugcNotes" placeholder="Notes (optional)" />
+              <button id="submitUGC" class="btn editable">Submit UGC</button>
+            </div>
+            <div class="table-wrap">
+              <table id="ugcTable">
+                <thead>
+                  <tr><th>Student</th><th>Club</th><th>Link</th><th>Notes</th><th>Status</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section id="settings" class="section">
+          <div class="card">
+            <div class="card-title">Settings</div>
+            <p>Upload logos and set club colors here (for now, edit `app.js` -> <code>styleGuides</code>).</p>
+          </div>
+        </section>
+          </main>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <!-- application logic -->
+  <script src="app.js"></script>
+</body>
+</html>
